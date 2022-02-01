@@ -43,7 +43,7 @@ jobs:
           # relative path to the place where source code withDockerfile is located
           context: ./backend/simple-api2
           # Note: tags has to be all lower-case
-          tags: ${{secrets.DOCKER_USERNAME}}/simple-api
+          tags: ${{secrets.DOCKER_USERNAME}}/backend
           # build on feature branches, push only on main branch
           push: ${{ github.ref == 'refs/heads/main' }}
 
