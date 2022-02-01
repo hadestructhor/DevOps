@@ -1,0 +1,37 @@
+version: '3.7'
+services:
+  backend:
+    container_name: backend
+    build:
+      ./backend/simple-api2
+    networks:
+      - backend
+      - frontend
+    depends_on:
+      - db
+  db:
+    container_name: db
+    volumes:
+      - /c/Users/LENOVO/Desktop/docker/DevOps/db/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=usr
+      - POSTGRES_PASSWORD=pwd
+    build:
+      ./db
+    networks:
+      - backend
+  httpd:
+    container_name: server
+    build:
+      ./server
+    ports:
+      - 80:80
+    networks:
+      - frontend
+    depends_on:
+      - backend
+
+networks:
+  backend:
+  frontend:
