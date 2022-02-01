@@ -43,8 +43,7 @@ jobs:
           # relative path to the place where source code withDockerfile is located
           context: ./backend/simple-api2
           # Note: tags has to be all lower-case
-          tags: ${{secrets.DOCKER_USERNAME}}/tp-devops-cpe:simple-api
-        run: docker build ${{secrets.DOCKER_USERNAME}}/backend .; docker push ${{secrets.DOCKER_USERNAME}}/backend
+          tags: ${{secrets.DOCKER_USERNAME}}/simple-api
 
       #Build database image and publish to dockerhub
       - name: Build image and push database
@@ -53,8 +52,7 @@ jobs:
           # relative path to the place where source code withDockerfile is located
           context: ./db
           # Note: tags has to be all lower-case
-          tags: ${{secrets.DOCKER_USERNAME}}/tp-devops-cpe:db
-        run: docker build ${{secrets.DOCKER_USERNAME}}/db .; docker push ${{secrets.DOCKER_USERNAME}}/db
+          tags: ${{secrets.DOCKER_USERNAME}}/db
 
       #Build httpd image and publish to dockerhub
       - name: Build image and push httpd
@@ -63,5 +61,4 @@ jobs:
           # relative path to the place where source code withDockerfile is located
           context: ./server
           # Note: tags has to be all lower-case
-          tags: ${{secrets.DOCKER_USERNAME}}/tp-devops-cpe:server
-        run: docker build ${{secrets.DOCKER_USERNAME}}/server .; docker push ${{secrets.DOCKER_USERNAME}}/server
+          tags: ${{secrets.DOCKER_USERNAME}}/server
