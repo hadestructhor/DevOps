@@ -38,33 +38,33 @@ jobs:
       
       #Build backend image and publish to dockerhub
       - name: Build image and push backend
-      uses: docker/build-push-action@v2
-      with:
-        # relative path to the place where source code withDockerfile is located
-        context: ./backend/simple-api2
-        # Note: tags has to be all lower-case
-        tags: ${{secrets.DOCKER_USERNAME}}/tp-devops-cpe:simple-api
-      run: docker build ${{secrets.DOCKER_USERNAME}}/backend .
-      run: docker push ${{secrets.DOCKER_USERNAME}}/backend
+        uses: docker/build-push-action@v2
+        with:
+          # relative path to the place where source code withDockerfile is located
+          context: ./backend/simple-api2
+          # Note: tags has to be all lower-case
+          tags: ${{secrets.DOCKER_USERNAME}}/tp-devops-cpe:simple-api
+        run: docker build ${{secrets.DOCKER_USERNAME}}/backend .
+        run: docker push ${{secrets.DOCKER_USERNAME}}/backend
 
       #Build database image and publish to dockerhub
       - name: Build image and push database
-      uses: docker/build-push-action@v2
-      with:
-        # relative path to the place where source code withDockerfile is located
-        context: ./db
-        # Note: tags has to be all lower-case
-        tags: ${{secrets.DOCKER_USERNAME}}/tp-devops-cpe:db
-      run: docker build ${{secrets.DOCKER_USERNAME}}/db .
-      run: docker push ${{secrets.DOCKER_USERNAME}}/db
+        uses: docker/build-push-action@v2
+        with:
+          # relative path to the place where source code withDockerfile is located
+          context: ./db
+          # Note: tags has to be all lower-case
+          tags: ${{secrets.DOCKER_USERNAME}}/tp-devops-cpe:db
+        run: docker build ${{secrets.DOCKER_USERNAME}}/db .
+        run: docker push ${{secrets.DOCKER_USERNAME}}/db
 
       #Build httpd image and publish to dockerhub
       - name: Build image and push httpd
-      uses: docker/build-push-action@v2
-      with:
-        # relative path to the place where source code withDockerfile is located
-        context: ./server
-        # Note: tags has to be all lower-case
-        tags: ${{secrets.DOCKER_USERNAME}}/tp-devops-cpe:server
-      run: docker build ${{secrets.DOCKER_USERNAME}}/server .
-      run: docker push ${{secrets.DOCKER_USERNAME}}/server
+        uses: docker/build-push-action@v2
+        with:
+          # relative path to the place where source code withDockerfile is located
+          context: ./server
+          # Note: tags has to be all lower-case
+          tags: ${{secrets.DOCKER_USERNAME}}/tp-devops-cpe:server
+        run: docker build ${{secrets.DOCKER_USERNAME}}/server .
+        run: docker push ${{secrets.DOCKER_USERNAME}}/server
