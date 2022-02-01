@@ -44,8 +44,7 @@ jobs:
           context: ./backend/simple-api2
           # Note: tags has to be all lower-case
           tags: ${{secrets.DOCKER_USERNAME}}/tp-devops-cpe:simple-api
-        run: docker build ${{secrets.DOCKER_USERNAME}}/backend .
-        run: docker push ${{secrets.DOCKER_USERNAME}}/backend
+        run: docker build ${{secrets.DOCKER_USERNAME}}/backend .; docker push ${{secrets.DOCKER_USERNAME}}/backend
 
       #Build database image and publish to dockerhub
       - name: Build image and push database
@@ -55,8 +54,7 @@ jobs:
           context: ./db
           # Note: tags has to be all lower-case
           tags: ${{secrets.DOCKER_USERNAME}}/tp-devops-cpe:db
-        run: docker build ${{secrets.DOCKER_USERNAME}}/db .
-        run: docker push ${{secrets.DOCKER_USERNAME}}/db
+        run: docker build ${{secrets.DOCKER_USERNAME}}/db .; docker push ${{secrets.DOCKER_USERNAME}}/db
 
       #Build httpd image and publish to dockerhub
       - name: Build image and push httpd
@@ -66,5 +64,4 @@ jobs:
           context: ./server
           # Note: tags has to be all lower-case
           tags: ${{secrets.DOCKER_USERNAME}}/tp-devops-cpe:server
-        run: docker build ${{secrets.DOCKER_USERNAME}}/server .
-        run: docker push ${{secrets.DOCKER_USERNAME}}/server
+        run: docker build ${{secrets.DOCKER_USERNAME}}/server .; docker push ${{secrets.DOCKER_USERNAME}}/server
