@@ -44,3 +44,4 @@ jobs:
           context: ./server
           tags: ${{secrets.DOCKER_USERNAME}}/server
           push: ${{ github.ref == 'refs/heads/main' }}
+          
