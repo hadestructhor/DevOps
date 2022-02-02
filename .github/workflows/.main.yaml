@@ -8,7 +8,7 @@ on:
   pull_request:
   workflow_run:
     workflows: test-backend
-    branches: master
+    branches: main
     types: completed
 env:
   GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
