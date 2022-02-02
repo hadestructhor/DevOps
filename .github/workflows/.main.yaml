@@ -6,6 +6,10 @@ on:
       - main
       - develop
   pull_request:
+  workflow_run:
+    workflows: test-backend
+    branches: master
+    types: completed
 env:
   GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 jobs:
@@ -29,7 +33,8 @@ jobs:
 
   # define job to build and publish docker image
   build-and-push-docker-image-backend:
-    if: github.ref == 'refs/heads/main'
+    #build and push only if workflow succeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     needs: test-backend
     # run only when code is compiling and tests are passing
     runs-on: ubuntu-latest
