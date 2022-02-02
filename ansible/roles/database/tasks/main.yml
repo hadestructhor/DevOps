@@ -1,0 +1,11 @@
+- name: Run Database
+  docker_container:
+    name: db
+    image: hadestructhor/db
+    state: started
+    env:
+      POSTGRES_DB: db
+      POSTGRES_USER: usr
+      POSTGRES_PASSWORD: pwd
+    networks:
+      - name: backend

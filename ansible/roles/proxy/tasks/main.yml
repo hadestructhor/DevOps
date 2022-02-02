@@ -1,0 +1,8 @@
+- name: Run HTTPD
+  docker_container:
+    name: httpd
+    image: hadestructhor/server
+    ports: 80:80
+    state: started
+    networks:
+      - name: frontend

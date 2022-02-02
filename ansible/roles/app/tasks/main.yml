@@ -1,0 +1,10 @@
+- name: Run Backend
+  docker_container:
+    name: backend
+    image: hadestructhor/backend
+    state: started
+    exposed_ports:
+      - 8080
+    networks:
+      - name: backend
+      - name: frontend

@@ -259,3 +259,175 @@ Pour build les images puis lancer tous les services:
 ```cmd
 docker-compose up --build
 ```
+
+# TP03
+
+## Intro
+### Inventories
+```yaml
+all:
+  vars:
+    ansible_user: centos
+    ansible_ssh_private_key_file: ~/.ssh/id_rsa_devops
+  children:
+    prod:
+      hosts: angelo.al-yacoub.takima.cloud
+```
+
+commande:
+`ansible all -i inventories/setup.yml -m ping`
+
+### Facts
+commande:
+`ansible all -i inventories/setup.yml -m setup -a "filter=ansible_distribution*"`
+resultat: 
+```cmd
+angelo.al-yacoub.takima.cloud | SUCCESS => {
+    "ansible_facts": {
+        "ansible_distribution": "CentOS",
+        "ansible_distribution_file_parsed": true,
+        "ansible_distribution_file_path": "/etc/centos-release",
+        "ansible_distribution_file_variety": "CentOS",
+        "ansible_distribution_major_version": "8",
+        "ansible_distribution_release": "Stream",
+        "ansible_distribution_version": "8",
+        "discovered_interpreter_python": "/usr/libexec/platform-python"
+    },
+    "changed": false
+}
+```
+----------------------------
+commande:
+`ansible all -i inventories/setup.yml -m yum -a "name=httpd state=absent" --become`
+resultat:
+```output
+angelo.al-yacoub.takima.cloud | CHANGED => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/libexec/platform-python"
+    },
+    "changed": true,
+    "msg": "",
+    "rc": 0,
+    "results": [
+        "Removed: mod_http2-1.15.7-3.module_el8.4.0+778+c970deab.x86_64",
+        "Removed: httpd-2.4.37-43.module_el8.5.0+1022+b541f3b1.x86_64"
+    ]
+}
+```
+
+## Playbook
+### First playbook
+```yaml
+- hosts: all
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Test connection
+      ping:
+```
+
+commande:
+`ansible-playbook -i inventories/setup.yml playbook.yml`
+
+resultat:
+```
+PLAY [all] *****************************************************************************************************************************************
+
+TASK [Test connection] *****************************************************************************************************************************
+ok: [angelo.al-yacoub.takima.cloud]
+
+PLAY RECAP *****************************************************************************************************************************************
+angelo.al-yacoub.takima.cloud : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+### Advanced playbook
+install_docker.yml:
+```yml
+- hosts: all
+  gather_facts: false
+  become: yes
+
+  # Install Docker
+  tasks:
+    - name: Clean packages
+      command:
+        cmd: dnf clean -y packages
+    - name: Install device-mapper-persistent-data
+      dnf:
+        name: device-mapper-persistent-data
+        state: latest
+    - name: Install lvm2
+      dnf:
+        name: lvm2
+        state: latest
+    - name: add repo docker
+      command:
+        cmd: sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+    - name: Install Docker
+      dnf:
+        name: docker-ce
+        state: present
+    - name: install python3
+      dnf:
+        name: python3
+    - name: Pip install
+      pip:
+        name: docker
+    - name: Make sure Docker is running
+      service: name=docker state=started
+      tags: docker
+```
+
+command:
+`ansible-playbook -i inventories/setup.yml install_docker.yml`
+
+result:
+```
+PLAY [all] *****************************************************************************************************************************************
+
+TASK [Clean packages] ******************************************************************************************************************************
+changed: [angelo.al-yacoub.takima.cloud]
+
+TASK [Install device-mapper-persistent-data] *******************************************************************************************************
+changed: [angelo.al-yacoub.takima.cloud]
+
+TASK [Install lvm2] ********************************************************************************************************************************
+changed: [angelo.al-yacoub.takima.cloud]
+
+TASK [add repo docker] *****************************************************************************************************************************
+changed: [angelo.al-yacoub.takima.cloud]
+
+TASK [Install Docker] ******************************************************************************************************************************
+changed: [angelo.al-yacoub.takima.cloud]
+
+TASK [install python3] *****************************************************************************************************************************
+changed: [angelo.al-yacoub.takima.cloud]
+
+TASK [Pip install] *********************************************************************************************************************************
+changed: [angelo.al-yacoub.takima.cloud]
+
+TASK [Make sure Docker is running] *****************************************************************************************************************
+changed: [angelo.al-yacoub.takima.cloud]
+
+PLAY RECAP *****************************************************************************************************************************************
+angelo.al-yacoub.takima.cloud : ok=8    changed=8    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+### using role
+
+Tout ce qu'il y avait dans tasks du fichier install_docker.yml à été déplacé dans le fichier roles/docker/main.yml.
+Voici le contenu du fichier instaall_docker.yml:
+```yml
+- hosts: all
+  gather_facts: false
+  become: yes
+
+  roles:
+    - docker
+```
+
+En lancant la commande suivante :
+`ansible-playbook -i inventories/setup.yml install_docker.yml`
+On obtient le même résultat qu'au départ.
+
+## Deploy your app

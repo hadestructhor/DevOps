@@ -1,0 +1,7 @@
+- name: Create network backend
+  docker_network:
+    name: backend
+
+- name: Create network frontend
+  docker_network:
+    name: frontend

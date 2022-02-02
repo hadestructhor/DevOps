@@ -1,0 +1,24 @@
+name: Build Backend and push
+on:
+  workflow_run:
+    workflows: ["Test Backend"]
+    types: [completed]
+    branches:
+      - main
+jobs:
+  build-and-push-docker-image-backend:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      - name: Login to DockerHub
+        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_ACCESS_TOKEN}}
+      
+      - name: Build image and push backend
+        uses: docker/build-push-action@v2
+        with:
+          context: ./backend/simple-api2
+          tags: ${{secrets.DOCKER_USERNAME}}/backend
+          push: ${{ github.ref == 'refs/heads/main' }}
