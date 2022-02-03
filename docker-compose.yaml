@@ -33,7 +33,7 @@ services:
       - backend
       - front
   front:
-    container_name: front
+    container_name: frontend
     build: ./front
     networks:
       - frontend
