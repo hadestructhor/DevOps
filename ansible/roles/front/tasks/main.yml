@@ -1,0 +1,7 @@
+- name: Run Frontend
+  docker_container:
+    name: frtonend
+    image: hadestructhor/front
+    state: started
+    networks:
+      - name: frontend
