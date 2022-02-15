@@ -70,12 +70,12 @@ CMD java /src/Main.java
 
 Voici la commande pour build l'image:
 ```cmd
-docker build -t hadestructhor/db .
+docker build -t hadestructhor/backend .
 ```
 
 Voici la commande pour lancer un conteneur de l'image:
 ```cmd
-docker run --name db hadestructhor/db
+docker run --name backend hadestructhor/backend
 ```
 
 ### Multistage build
@@ -150,7 +150,7 @@ management:
 
 Voici la commande pour lancer le backend dans le même network que la bd:
 ```cmd
-docker run --name db -d -p 8080:8080 --network=tp-1-network-db hadestructhor/db
+docker run --name backend -d -p 8080:8080 --network=tp-1-network-db hadestructhor/backend
 ```
 
 ## Server
@@ -426,8 +426,126 @@ Voici le contenu du fichier instaall_docker.yml:
     - docker
 ```
 
+Le contenu de la task main.yml du role docker est le suivant:
+
+```yml
+- name: Clean packages
+  command:
+    cmd: dnf clean -y packages
+- name: Install device-mapper-persistent-data
+  dnf:
+    name: device-mapper-persistent-data
+    state: latest
+- name: Install lvm2
+  dnf:
+    name: lvm2
+    state: latest
+- name: add repo docker
+  command:
+    cmd: sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+- name: Install Docker
+  dnf:
+    name: docker-ce
+    state: present
+- name: install python3
+  dnf:
+    name: python3
+- name: Pip install
+  pip:
+    name: docker
+- name: Make sure Docker is running
+  service: name=docker state=started
+  tags: docker
+```
+
 En lancant la commande suivante :
 `ansible-playbook -i inventories/setup.yml install_docker.yml`
 On obtient le même résultat qu'au départ.
 
 ## Deploy your app
+
+Voici le contenu de install_docker.yml qui sert à installer docker sur le serveur puis de récupérer et lancer chaque image :
+
+```yml
+- hosts: all
+  gather_facts: false
+  become: yes
+
+  roles:
+    - docker
+    - network
+    - database
+    - app
+    - front
+    - proxy
+```
+
+Le contenu de la task main.yml du role docker n'a pas changé.
+
+Le contenu de la task main.yml du role database est le suivant:
+
+```yml
+- name: Create network backend
+  docker_network:
+    name: backend
+
+- name: Create network frontend
+  docker_network:
+    name: frontend
+```
+
+Le contenu de la task main.yml du role network est le suivant:
+
+```yml
+- name: Run Database
+  docker_container:
+    name: db
+    image: hadestructhor/db
+    state: started
+    env:
+      POSTGRES_DB: db
+      POSTGRES_USER: usr
+      POSTGRES_PASSWORD: pwd
+    networks:
+      - name: backend
+```
+
+Le contenu de la task main.yml du role network est le suivant:
+
+```yml
+- name: Run Backend
+  docker_container:
+    name: backend
+    image: hadestructhor/backend
+    state: started
+    exposed_ports:
+      - 8080
+    networks:
+      - name: backend
+      - name: frontend
+```
+
+Le contenu de la task main.yml du role front est le suivant:
+
+```yml
+- name: Run Frontend
+  docker_container:
+    name: frontend
+    image: hadestructhor/front
+    state: started
+    networks:
+      - name: frontend
+```
+
+Le contenu de la task main.yml du role network est le suivant:
+
+```yml
+- name: Run HTTPD
+  docker_container:
+    name: httpd
+    image: hadestructhor/server
+    ports: 80:80
+    state: started
+    networks:
+      - name: frontend
+```
